@@ -356,4 +356,18 @@ RCT_EXPORT_METHOD(stopPlayer:(RCTPromiseResolveBlock)resolve
     }
 }
 
+RCT_EXPORT_METHOD(delete:(NSString*)path
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *cacheDirectory = [paths objectAtIndex:0];
+    NSString *filePath = [cacheDirectory stringByAppendingPathComponent:path];
+
+    NSError *error;
+    BOOL success = [[NSFileManager defaultManager] removeItemAtPath:filePath error:&error];
+    if (!success) {
+        NSLog(@"Error removing file at path: %@", error.localizedDescription);
+    }
+}
+
 @end

@@ -296,6 +296,15 @@ class AudioRecorderPlayer {
   setSubscriptionDuration = async (sec: number): Promise<string> => {
     return RNAudioRecorderPlayer.setSubscriptionDuration(sec);
   };
+
+  /**
+   * delete a recording.
+   * @param {string} path file path.
+   * @returns {Promise<string>}
+   */
+  delete = async (path: string): Promise<void> => {
+    return RNAudioRecorderPlayer.delete(path);
+  };
 }
 
 export default AudioRecorderPlayer;
