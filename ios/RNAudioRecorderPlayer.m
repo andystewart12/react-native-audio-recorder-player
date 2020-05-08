@@ -46,8 +46,15 @@ double subscriptionDuration = 0.1;
 {
   NSNumber *currentTime = [NSNumber numberWithDouble:audioRecorder.currentTime * 1000];
   // NSString* status = [NSString stringWithFormat:@"{\"current_position\": \"%@\"}", [currentTime stringValue]];
+  NSNumber *averagePower = [NSNumber numberWithDouble:0];
+  NSNumber *peakPower = [NSNumber numberWithDouble:0];
+  [audioRecorder updateMeters];
+  averagePower = [NSNumber numberWithDouble:[audioRecorder averagePowerForChannel: 0]];
+  peakPower = [NSNumber numberWithDouble:[audioRecorder peakPowerForChannel: 0]];
   NSDictionary *status = @{
                          @"current_position" : [currentTime stringValue],
+                         @"average_power" : [averagePower stringValue],
+                         @"peak_power" : [peakPower stringValue],
                          };
   [self sendEventWithName:@"rn-recordback" body:status];
 }
@@ -186,7 +193,7 @@ RCT_EXPORT_METHOD(startRecorder:(NSString*)path
 
   // Setup audio session
   AVAudioSession *session = [AVAudioSession sharedInstance];
-  [session setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+  [session setCategory:AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionAllowBluetooth error:nil];
 
   // set volume default to speaker
   UInt32 doChangeDefaultRoute = 1;
@@ -196,7 +203,8 @@ RCT_EXPORT_METHOD(startRecorder:(NSString*)path
                         initWithURL:audioFileURL
                         settings:audioSettings
                         error:nil];
-  
+  audioRecorder.meteringEnabled = true;
+
   [audioRecorder setDelegate:self];
   [audioRecorder record];
   [self startRecorderTimer];
