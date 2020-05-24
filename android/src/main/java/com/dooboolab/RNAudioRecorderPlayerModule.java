@@ -30,6 +30,7 @@ import com.facebook.react.modules.core.PermissionListener;
 
 import org.json.JSONException;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -116,6 +117,12 @@ public class RNAudioRecorderPlayerModule extends ReactContextBaseJavaModule impl
           long time = SystemClock.elapsedRealtime() - systemTime;
           WritableMap obj = Arguments.createMap();
           obj.putDouble("current_position", time);
+
+          int average_power = mediaRecorder != null ? mediaRecorder.getMaxAmplitude() : 0;
+          double peak_power = 32767;
+          obj.putInt("average_power", average_power);
+          obj.putInt("peak_power", (int) peak_power);
+
           sendEvent(reactContext, "rn-recordback", obj);
           recordHandler.postDelayed(this, subsDurationMillis);
         }
@@ -144,6 +151,12 @@ public class RNAudioRecorderPlayerModule extends ReactContextBaseJavaModule impl
     mediaRecorder = null;
 
     promise.resolve("file:///" + audioFileURL);
+  }
+
+  @ReactMethod
+  public void delete(String path, Promise promise) {
+    File file = new File("file:///" + path);
+    file.delete();
   }
 
   @ReactMethod
